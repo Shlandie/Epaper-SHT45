@@ -1,5 +1,0 @@
-"-specs=/home/bobo-linux/workspace/dht22_ssd1306/build/bootloader/specs/picolibc.specs"
--mlongcalls
--fno-builtin-memcpy
--fno-builtin-memset
--fno-builtin-bzero
