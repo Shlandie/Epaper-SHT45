@@ -1,5 +1,6 @@
 #pragma once
 
+#include "freertos/FreeRTOS.h"
 
 
 
@@ -28,4 +29,4 @@
 
 
 
-void sensor_create_task(void);
+BaseType_t sensor_create_task(void);

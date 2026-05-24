@@ -23,7 +23,8 @@ void sensor_task(void *pvParameters)
 }
 
 
-void sensor_create_task()
+BaseType_t sensor_create_task()
 {
-	ESP_ERROR_CHECK(xTaskCreatePinnedToCore(sensor_task, "sensor_task", SENSOR_TASK_STACK_SIZE, NULL, SENSOR_TASK_PRIORITY, &sensor_handle, SENSOR_TASK_CORE_ID));
+	BaseType_t ret = xTaskCreatePinnedToCore(sensor_task, "sensor_task", SENSOR_TASK_STACK_SIZE, NULL, SENSOR_TASK_PRIORITY, &sensor_handle, SENSOR_TASK_CORE_ID);
+	return ret;
 }
