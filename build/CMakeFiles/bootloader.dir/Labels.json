@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/bobo-linux/workspace/dht22_ssd1306/build/CMakeFiles/bootloader"
+		},
+		{
+			"file" : "/home/bobo-linux/workspace/dht22_ssd1306/build/CMakeFiles/bootloader.rule"
+		},
+		{
+			"file" : "/home/bobo-linux/workspace/dht22_ssd1306/build/CMakeFiles/bootloader-complete.rule"
+		},
+		{
+			"file" : "/home/bobo-linux/workspace/dht22_ssd1306/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule"
+		},
+		{
+			"file" : "/home/bobo-linux/workspace/dht22_ssd1306/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule"
+		},
+		{
+			"file" : "/home/bobo-linux/workspace/dht22_ssd1306/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule"
+		},
+		{
+			"file" : "/home/bobo-linux/workspace/dht22_ssd1306/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule"
+		},
+		{
+			"file" : "/home/bobo-linux/workspace/dht22_ssd1306/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule"
+		},
+		{
+			"file" : "/home/bobo-linux/workspace/dht22_ssd1306/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule"
+		},
+		{
+			"file" : "/home/bobo-linux/workspace/dht22_ssd1306/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"bootloader"
+		],
+		"name" : "bootloader"
+	}
+}
