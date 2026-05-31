@@ -16,6 +16,7 @@ void app_main(void)
 	ESP_LOGI(TAG, "Creating display task");
 	assert(display_create_task() == pdTRUE);
 
+	
 	ESP_LOGI(TAG, "Creating sensor task");
 	assert(sensor_create_task() == pdTRUE);
 }

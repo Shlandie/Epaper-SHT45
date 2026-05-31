@@ -18,48 +18,50 @@
 #include "portmacro.h"
 #include "widgets/label/lv_label.h"
 #include "display.h"
+#include "sensor.h"
 
 LV_IMG_DECLARE(cat);
 
 static const char TAG[] = "display_task";
 
 TaskHandle_t display_handle;
-lv_disp_t *display_lvgl_handle;
+static lv_disp_t *display_lvgl_handle;
 
 /*
 * Initialize LVGL display styling etc. Return label to control rendered text
 * @return pointer to the label
 */
-lv_obj_t *display_initialize_lvgl_styling()
+static display_ui_t display_initialize_lvgl_styling()
 {
-	lv_obj_t *label = NULL;
+	lv_obj_t *scr = NULL;
+	display_ui_t ui = {0};
 	
 	if (lvgl_port_lock(0)) {
 	    lv_disp_set_rotation(display_lvgl_handle, LV_DISPLAY_ROTATION_0);
 
-	    lv_obj_t *scr = lv_disp_get_scr_act(display_lvgl_handle);
-		lv_obj_t *img = lv_img_create(scr);
-	    label = lv_label_create(scr);
+	    scr = lv_disp_get_scr_act(display_lvgl_handle);
+		ui.img = lv_img_create(scr);
+	    ui.label = lv_label_create(scr);
 		
-		lv_obj_set_style_text_font(label, &lv_font_montserrat_14, LV_PART_MAIN);
-		lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
-	    lv_label_set_long_mode(label, LV_LABEL_LONG_MODE_WRAP);
-		lv_label_set_text(label, "");
-	    lv_obj_set_width(label, lv_display_get_physical_horizontal_resolution(display_lvgl_handle));
+		lv_obj_set_style_text_font(ui.label, &lv_font_montserrat_14, LV_PART_MAIN);
+		lv_obj_set_style_text_align(ui.label, LV_TEXT_ALIGN_CENTER, 0);
+	    lv_label_set_long_mode(ui.label, LV_LABEL_LONG_MODE_WRAP);
+		lv_label_set_text(ui.label, "");
+	    lv_obj_set_width(ui.label, lv_display_get_physical_horizontal_resolution(display_lvgl_handle));
 
 		// Setting introductory image before showing any temperature and humidity data
-		lv_img_set_src(img, &cat);
-	    lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
+		lv_img_set_src(ui.img, &cat);
+	    lv_obj_align(ui.img, LV_ALIGN_CENTER, 0, 0);
 		
 	    lvgl_port_unlock();
 	}
-	return label;
+	return ui;
 }
 
 /*
 * Initialize the ssd1306 display
 */
-void display_initialize_ssd1306()
+static void display_initialize_ssd1306()
 {
 	   ESP_LOGI(TAG, "Initialize I2C bus");
 	    i2c_master_bus_handle_t i2c_bus = NULL;
@@ -129,14 +131,25 @@ void display_initialize_ssd1306()
 }
 
 
-void display_task(void *pvParameters)
+static void display_task(void *pvParameters)
 {
 	display_initialize_ssd1306();
-	lv_obj_t *lvgl_label = display_initialize_lvgl_styling();
+	display_ui_t ui = display_initialize_lvgl_styling();
+	ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+	if (lvgl_port_lock(0)) {
+		lv_obj_del(ui.img);
+		lvgl_port_unlock();
+	}
 	
 	for(;;)
 	{
-		vTaskDelay(pdMS_TO_TICKS(1000));
+		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+		char buf[64] = {0};
+		snprintf(buf, sizeof(buf), "Temperature\n%.2f \xC2\xB0""C\nHumidity\n%.2f%%", sensor_temperature, sensor_humidity);
+		if (lvgl_port_lock(0)) {
+			lv_label_set_text(ui.label,buf);
+			lvgl_port_unlock();
+		}
 	}
 }
 
@@ -146,3 +159,10 @@ BaseType_t display_create_task()
 	BaseType_t ret = xTaskCreatePinnedToCore(display_task, "display_task", DISPLAY_TASK_STACK_SIZE, NULL, DISPLAY_TASK_PRIORITY, &display_handle, DISPLAY_TASK_CORE_ID);
 	return ret;
 }
+
+
+
+
+
+
+

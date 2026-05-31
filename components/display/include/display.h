@@ -2,6 +2,14 @@
 
 #include "freertos/FreeRTOS.h"
 
+#include "lvgl.h"
+
+extern TaskHandle_t display_handle;
+
+typedef struct {
+	lv_obj_t *label;
+	lv_obj_t *img;
+}display_ui_t;
 
 #define DISPLAY_I2C_CONTROLLER 								0
 
