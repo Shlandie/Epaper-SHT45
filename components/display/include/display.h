@@ -6,6 +6,8 @@
 
 extern TaskHandle_t display_handle;
 
+extern bool after_deep_sleep;
+
 typedef struct {
 	lv_obj_t *label;
 	lv_obj_t *img;

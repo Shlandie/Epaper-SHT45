@@ -9,6 +9,7 @@
 
 #include "esp_err.h"
 #include "esp_log.h"
+#include "esp_sleep.h"
 #include "lvgl.h"
 #include "esp_lvgl_port.h"
 #include "esp_lcd_panel_dev.h"
@@ -19,6 +20,7 @@
 #include "widgets/label/lv_label.h"
 #include "display.h"
 #include "sensor.h"
+#include "widgets/span/lv_span.h"
 
 LV_IMG_DECLARE(cat);
 
@@ -26,6 +28,10 @@ static const char TAG[] = "display_task";
 
 TaskHandle_t display_handle;
 static lv_disp_t *display_lvgl_handle;
+
+RTC_DATA_ATTR  bool after_deep_sleep;
+RTC_DATA_ATTR  char saved_humidity[16];
+RTC_DATA_ATTR  char saved_temperature[16];
 
 /*
 * Initialize LVGL display styling etc. Return label to control rendered text
@@ -40,19 +46,25 @@ static display_ui_t display_initialize_lvgl_styling()
 	    lv_disp_set_rotation(display_lvgl_handle, LV_DISPLAY_ROTATION_0);
 
 	    scr = lv_disp_get_scr_act(display_lvgl_handle);
-		ui.img = lv_img_create(scr);
 	    ui.label = lv_label_create(scr);
 		
 		lv_obj_set_style_text_font(ui.label, &lv_font_montserrat_14, LV_PART_MAIN);
 		lv_obj_set_style_text_align(ui.label, LV_TEXT_ALIGN_CENTER, 0);
 	    lv_label_set_long_mode(ui.label, LV_LABEL_LONG_MODE_WRAP);
-		lv_label_set_text(ui.label, "");
+		if (after_deep_sleep)
+			lv_label_set_text_fmt(ui.label, "Temperature\n%s \xC2\xB0""C\nHumidity\n%s%%", saved_temperature, saved_humidity);
+		else 
+			lv_label_set_text(ui.label, "");
 	    lv_obj_set_width(ui.label, lv_display_get_physical_horizontal_resolution(display_lvgl_handle));
 
 		// Setting introductory image before showing any temperature and humidity data
-		lv_img_set_src(ui.img, &cat);
-	    lv_obj_align(ui.img, LV_ALIGN_CENTER, 0, 0);
-		
+		if(!after_deep_sleep)
+		{
+			ui.img = lv_img_create(scr);
+			lv_img_set_src(ui.img, &cat);
+		    lv_obj_align(ui.img, LV_ALIGN_CENTER, 0, 0);
+		}
+
 	    lvgl_port_unlock();
 	}
 	return ui;
@@ -135,10 +147,13 @@ static void display_task(void *pvParameters)
 {
 	display_initialize_ssd1306();
 	display_ui_t ui = display_initialize_lvgl_styling();
-	ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-	if (lvgl_port_lock(0)) {
-		lv_obj_del(ui.img);
-		lvgl_port_unlock();
+	if (!after_deep_sleep)
+	{
+		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+		if (lvgl_port_lock(0)) {
+			lv_obj_del(ui.img);
+			lvgl_port_unlock();
+		}
 	}
 	
 	for(;;)
@@ -150,6 +165,12 @@ static void display_task(void *pvParameters)
 			lv_label_set_text(ui.label,buf);
 			lvgl_port_unlock();
 		}
+		vTaskDelay(pdMS_TO_TICKS(1000));
+		after_deep_sleep = 1;
+		snprintf(saved_humidity, sizeof(saved_humidity), "%.2f", sensor_humidity);
+		snprintf(saved_temperature, sizeof(saved_temperature), "%.2f", sensor_temperature);
+		ESP_ERROR_CHECK(esp_sleep_enable_timer_wakeup(20 * 1000000ULL));
+		esp_deep_sleep_start();
 	}
 }
 

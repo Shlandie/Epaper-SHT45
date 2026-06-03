@@ -35,7 +35,6 @@ static void sensor_task(void *pvParameters)
 	{
 		dht_read_float_data(DHT_TYPE_AM2301, GPIO_NUM_5, &sensor_humidity,&sensor_temperature);
 		xTaskNotifyGive(display_handle);
-		vTaskDelay(pdMS_TO_TICKS(15000));
 	}
 }
 
