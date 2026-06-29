@@ -11,7 +11,6 @@
 #include "common.h"
 #include "sensor.h"
 #include "display.h"
-#include "dht.h"
 
 static TaskHandle_t sensor_handle;
 
@@ -20,6 +19,7 @@ float sensor_humidity, sensor_temperature;
 
 static void sensor_task(void *pvParameters)
 {
+	/*
 	while(1)
 	{
 		if(sensor_humidity != 0 && sensor_temperature != 0)
@@ -30,12 +30,16 @@ static void sensor_task(void *pvParameters)
 		dht_read_float_data(DHT_TYPE_AM2301, SENSOR_GPIO, &sensor_humidity, &sensor_temperature);
 		vTaskDelay(pdMS_TO_TICKS(2000));
 	}
+	*/
 	
 	for(;;)
 	{
+		vTaskDelay(pdMS_TO_TICKS(4000));
+		/*
 		dht_read_float_data(DHT_TYPE_AM2301, GPIO_NUM_5, &sensor_humidity,&sensor_temperature);
 		xTaskNotifyGive(display_handle);
 		if (!after_deep_sleep) vTaskDelay(pdMS_TO_TICKS(1000));
+		*/
 	}
 }
 

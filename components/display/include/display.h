@@ -2,31 +2,26 @@
 
 #include "freertos/FreeRTOS.h"
 
-#include "lvgl.h"
 
-extern TaskHandle_t display_handle;
+
+#define DISPLAY_PIN_BUSY    								13
+#define DISPLAY_PIN_RST     								9
+#define DISPLAY_PIN_DC     									18
+#define DISPLAY_PIN_CS      								10
+#define DISPLAY_PIN_SCK     								12
+#define DISPLAY_PIN_MOSI    								11
+
+#define DISPLAY_V_RES										128
+#define DISPLAY_H_RES										296
+#define DISPLAY_ROTATION									1
+
+
+
+extern TaskHandle_t display_task_handle;
 
 extern bool after_deep_sleep;
 
-typedef struct {
-	lv_obj_t *label;
-	lv_obj_t *img;
-}display_ui_t;
 
-#define DISPLAY_I2C_CONTROLLER 								0
-
-#define DISPLAY_PIN_SDA										10
-#define DISPLAY_PIN_SCL										11
-#define DISPLAY_PIN_RST										-1
-
-#define DISPLAY_I2C_HW_ADDR									0x3C
-#define DISPLAY_SCL_SPEED									(400 * 1000)
-#define DISPLAY_CMD_BITS									8
-#define DISPLAY_PARAM_BITS									8
-#define DISPLAY_DC_BIT_OFFSET								6
-
-#define DISPLAY_V_RES										64
-#define DISPLAY_H_RES										128
 
 
 
