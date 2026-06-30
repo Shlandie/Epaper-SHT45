@@ -22,11 +22,13 @@
 TaskHandle_t display_task_handle;
 
 RTC_DATA_ATTR bool g_after_deep_sleep;
-RTC_DATA_ATTR static uint16_t temperature_cursor_XY[2];
-RTC_DATA_ATTR static uint16_t humidity_cursor_XY[2];
+RTC_DATA_ATTR static int16_t temperature_cursor_XY[2];
+RTC_DATA_ATTR static int16_t humidity_cursor_XY[2];
 
 float temperature = 25.5;
 float humidity = 56.7;
+float temperature2 = 20.1;
+float humidity2 = 44.2;
 
 
 
@@ -51,6 +53,11 @@ static void display_task(void *pvParameters)
 	for(;;)
 	{		
 		vTaskDelay(pdMS_TO_TICKS(4000));
+		display_update_data(temperature2, humidity2);
+		temperature2 += 1;
+		humidity2 += 1;
+		vTaskDelay(pdMS_TO_TICKS(4000));
+		display_clear_data_ghosting(temperature2, humidity2, temperature_cursor_XY, humidity_cursor_XY);
 		/*
 		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 		char buf[64] = {0};
