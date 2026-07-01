@@ -11,6 +11,7 @@
 #include "esp_sleep.h"
 
 #include "common.h"
+#include "system.h"
 #include "display.h"
 #include "sensor.h"
 
@@ -19,16 +20,15 @@
 
 //static const char TAG[] = "display_task";
 
-TaskHandle_t display_task_handle;
+TaskHandle_t g_display_task_handle;
 
-RTC_DATA_ATTR bool g_after_deep_sleep;
-RTC_DATA_ATTR static int16_t temperature_cursor_XY[2];
-RTC_DATA_ATTR static int16_t humidity_cursor_XY[2];
+RTC_DATA_ATTR static int16_t s_temperature_cursor_XY[2];
+RTC_DATA_ATTR static int16_t s_humidity_cursor_XY[2];
 
-float temperature = 25.5;
+float temperature = -25.5;
 float humidity = 56.7;
-float temperature2 = 20.1;
-float humidity2 = 44.2;
+float temperature2 = -20.1;
+float humidity2 = -44.2;
 
 
 
@@ -42,11 +42,11 @@ static void display_task(void *pvParameters)
 	// Setup all display styling (Rotation, text font, color, etc.)
 	display_styling_setup();
 	
-	if (!g_after_deep_sleep)
+	if (!g_system_after_deep_sleep)
 	{
 		// Wait for initial data before first draw
 		//ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-		display_initial_draw(temperature, humidity, temperature_cursor_XY, humidity_cursor_XY);
+		display_initial_draw(temperature, humidity, s_temperature_cursor_XY, s_humidity_cursor_XY);
 	}
 	
 
@@ -57,15 +57,11 @@ static void display_task(void *pvParameters)
 		temperature2 += 1;
 		humidity2 += 1;
 		vTaskDelay(pdMS_TO_TICKS(4000));
-		display_clear_data_ghosting(temperature2, humidity2, temperature_cursor_XY, humidity_cursor_XY);
+		display_clear_data_ghosting(temperature2, humidity2, s_temperature_cursor_XY, s_humidity_cursor_XY);
 		/*
 		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 		char buf[64] = {0};
 		snprintf(buf, sizeof(buf), "Temperature\n%.2f \xC2\xB0""C\nHumidity\n%.2f%%", sensor_temperature, sensor_humidity);
-		if (lvgl_port_lock(0)) {
-			lv_label_set_text(ui.label,buf);
-			lvgl_port_unlock();
-		}
 		if (!after_deep_sleep) vTaskDelay(pdMS_TO_TICKS(1000));
 		
 		after_deep_sleep = 1;

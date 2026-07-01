@@ -1,4 +1,4 @@
 idf_component_register(SRCS "sensor.c"
                     INCLUDE_DIRS "include"
-                    REQUIRES "common" "display" "sht4x")
+                    REQUIRES "common" "system" "display" "sht4x")
 
