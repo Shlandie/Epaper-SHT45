@@ -8,6 +8,7 @@
 #include "GxEPD2_290_BS.h"
 
 #include "Fonts/TomThumb.h"
+#include "bitmaps/splash.h"
 
 
 //////////////////////////////////////////////////////////
@@ -50,6 +51,15 @@ void display_styling_setup(void)
 	display.setFont(&TomThumb); 																																	/* Try exprimeting with Kconfig for the abillity to choose different fonts on the go */   
 	display.setTextSize(DISPLAY_FONT_SIZE);         
 	display.setTextWrap(false);	// Avoids weird auto-wrap on small partial windows
+}
+
+
+void display_initial_splash(void)
+{
+	display.firstPage();
+	do {
+		display.drawBitmap(0, 0, splash_bitmap, DISPLAY_WIDTH, DISPLAY_HEIGHT, GxEPD_BLACK);
+	} while (display.nextPage());
 }
 
 

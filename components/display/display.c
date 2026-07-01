@@ -33,6 +33,10 @@ static void display_task(void *pvParameters)
 	
 	if (!g_system_after_deep_sleep)
 	{
+		// Draw boot splash art busy-wait
+		display_initial_splash();
+		esp_rom_delay_us(3000000); // 3 seconds
+		
 		// Wait for initial data before first draw
 		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 		display_initial_draw(g_sensor_data.temperature, g_sensor_data.humidity, s_temperature_cursor_XY, s_humidity_cursor_XY);

@@ -42,6 +42,11 @@ void display_init(void);
 void display_styling_setup(void);
 
 /*
+* Render monochrome image C-style array
+*/
+void display_initial_splash(void);
+
+/*
 * Display initial temperature and humidity text and data on launch. Send back cursor location before printing data for partial screen updates on the number values later.
 * @param temperature & humidity - current temperature and humidity from sensor data, temperature_cursor_XY & humidity_cursor_XY - store cursor location for future partial scren updates on the number values
 */
