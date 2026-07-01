@@ -16,7 +16,7 @@ typedef struct sht4x_data{
 	bool heater_on;
 }sht4x_data_t;
 
-
+extern sht4x_data_t g_sensor_data;
 
 
 
