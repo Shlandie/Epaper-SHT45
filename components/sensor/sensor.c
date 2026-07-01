@@ -11,6 +11,7 @@
 #include "esp_sleep.h"
 
 #include "common.h"
+#include "portmacro.h"
 #include "system.h"
 #include "sensor.h"
 #include "display.h"
@@ -36,7 +37,9 @@ static void sensor_task(void *pvParameters)
 		esp_light_sleep_start();
 	}
 	
-	// Initialize device descriptor
+	// Initialize I2C, device descriptor
+	i2cdev_init();
+	
 	s_sensor_dev.repeatability	= SHT4X_HIGH;	// Read takes longer but is more accurate
 	sht4x_init_desc(&s_sensor_dev, 0, SENSOR_PIN_SDA, SENSOR_PIN_SCL);
 	sht4x_init(&s_sensor_dev);
@@ -85,6 +88,12 @@ static void sensor_task(void *pvParameters)
 	}
 	s_temperature_before_sleep = g_sensor_data.temperature;
 	s_humidity_before_sleep = g_sensor_data.humidity;
+	xTaskNotifyGive(g_display_task_handle);
+	
+	for(;;)
+	{
+		vTaskDelay(portMAX_DELAY);
+	}
 }
 
 
